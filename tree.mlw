@@ -1,0 +1,81 @@
+module ParametricBST
+
+    use int.Int
+
+    type key = int
+    type tree = Leaf | Node tree key tree
+
+    (* self-defined predicate/axioms *)
+    predicate tree_less (t : tree) (k : key) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k1 r) -> (tree_less l k) /\ (k1 < k) /\ (tree_less r k) 
+        end 
+    
+    predicate tree_greater (t : tree) (k : key) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k1 r) -> (tree_greater l k) /\ (k1 > k) /\ (tree_greater r k) 
+        end
+    
+    predicate valid_tree (t : tree) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k r) -> (tree_less l k) /\ (tree_greater r k)
+        end
+
+    val split (t : tree) (k : key) : (tree, bool, tree)
+    val join (t1 : tree) (t2 : tree) : tree
+
+    let empty () : tree = 
+        Leaf
+
+    let singleton (k : key) : tree =
+        Node Leaf k Leaf
+
+    let delete (t : tree) (k : key) : tree =
+        let (l, _, r) = split t k in 
+        join l r
+
+    let joinM (t1 : tree) (k : key) (t2 : tree) = 
+        join t1 (join (singleton k) t2)
+
+    let insert (t : tree) (k : key) : tree =
+        let (l, _, r) = split t k in 
+        joinM l k r
+
+    let rec intersection (t1 : tree) (t2 : tree) : tree =
+        match (t1, t2) with
+          (Leaf, _) -> Leaf 
+        | (_, Leaf) -> Leaf 
+        | (Node l1 k1 r1, _) ->
+            let (l2, b, r2) = split t2 k1 in
+            let l = intersection l1 l2 in
+            let r = intersection r1 r2 in 
+            if b then joinM l k1 r else join l r 
+        end
+
+    (* t1 - t2 *)
+    let rec difference (t1 : tree) (t2 : tree) : tree =
+        match (t1, t2) with 
+          (Leaf, _) -> Leaf 
+        | (_, Leaf) -> t1 
+        | (Node l1 k1 r1, _) ->
+            let (l2, b, r2) = split t2 k1 in 
+            let l = difference l1 l2 in 
+            let r = difference r1 r2 in 
+            if b then join l r else joinM l k1 r 
+        end 
+
+    let rec union (t1 : tree) (t2 : tree) : tree =
+        match (t1 ,t2) with 
+          (Leaf, _) -> t2 
+        | (_, Leaf) -> t1 
+        | (Node l1 k1 r1, _) ->
+            let (l2, _, r2) = split t2 k1 in 
+            let l = union l1 l2 in 
+            let r = union r1 r2 in 
+            joinM l k1 r
+        end
+
+end
