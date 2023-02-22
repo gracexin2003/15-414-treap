@@ -23,28 +23,52 @@ module ParametricBST
           Leaf -> true 
         | (Node l k r) -> (tree_less l k) /\ (tree_greater r k)
         end
+    
+    predicate contains (t : tree) (k : key) =
+        match t with 
+          Leaf -> false 
+        | (Node l k1 r) -> k1 = k \/ contains l k \/ contains r k
+        end
 
+    (* split and join*)
     val split (t : tree) (k : key) : (tree, bool, tree)
     val join (t1 : tree) (t2 : tree) : tree
 
+    (* axioms with split and join *)
+    axiom valid_split: forall t k. let (l, _, r) = split t k
+        in valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k
+    axiom valid_join: forall t1 t2. valid_tree (join t1 t2)
+
+    (* tree functions *)
     let empty () : tree = 
+        ensures {valid_tree result}
         Leaf
 
     let singleton (k : key) : tree =
+        ensures {valid_tree result}
         Node Leaf k Leaf
 
     let delete (t : tree) (k : key) : tree =
+        requires {valid_tree t}
+        ensures {valid_tree result}
         let (l, _, r) = split t k in 
         join l r
 
-    let joinM (t1 : tree) (k : key) (t2 : tree) = 
+    let joinM (t1 : tree) (k : key) (t2 : tree) : tree = 
+        requires {valid_tree t1 /\ valid_tree t2}
+        ensures {valid_tree result}
         join t1 (join (singleton k) t2)
 
     let insert (t : tree) (k : key) : tree =
+        requires {valid_tree t}
+        ensures {valid_tree result}
         let (l, _, r) = split t k in 
         joinM l k r
 
     let rec intersection (t1 : tree) (t2 : tree) : tree =
+        requires {valid_tree t1 /\ valid_tree t2}
+        variant {t1}
+        ensures {valid_tree result}
         match (t1, t2) with
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> Leaf 
@@ -57,6 +81,9 @@ module ParametricBST
 
     (* t1 - t2 *)
     let rec difference (t1 : tree) (t2 : tree) : tree =
+        requires {valid_tree t1 /\ valid_tree t2}
+        variant {t1}
+        ensures {valid_tree result}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
@@ -68,6 +95,9 @@ module ParametricBST
         end 
 
     let rec union (t1 : tree) (t2 : tree) : tree =
+        requires {valid_tree t1 /\ valid_tree t2}
+        variant {t1}
+        ensures {valid_tree result}
         match (t1 ,t2) with 
           (Leaf, _) -> t2 
         | (_, Leaf) -> t1 
