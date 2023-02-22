@@ -17,36 +17,42 @@ module ParametricBST
           Leaf -> true 
         | (Node l k1 r) -> (tree_greater l k) /\ (k1 > k) /\ (tree_greater r k) 
         end
-    
-    predicate valid_tree (t : tree) = 
-        match t with 
-          Leaf -> true 
-        | (Node l k r) -> (tree_less l k) /\ (tree_greater r k)
-        end
-    
+
     predicate contains (t : tree) (k : key) =
         match t with 
           Leaf -> false 
         | (Node l k1 r) -> k1 = k \/ contains l k \/ contains r k
         end
+    
+    predicate valid_tree (t : tree) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k r) -> valid_tree l /\ tree_less l k /\ contains l k = false
+            /\ valid_tree r /\ tree_greater r k /\ contains r k = false
+            /\ (forall k1. (k1 < k /\ contains t k1) -> contains l k1)
+            /\ (forall k1. (k1 > k /\ contains t k1) -> contains r k1)
+        (* | (Node l k r) -> (tree_less l k) /\ (tree_greater r k) /\ (valid_tree l) /\ (valid_tree r)
+            /\ (contains l k = false) /\ (contains r k = false)
+            /\ (forall k1. (k1 < k /\ contains t k1) -> contains l k1)
+            /\ (forall k1. (k1 > k /\ contains t k1) -> contains r k1) *)
+        end
 
     (* split and join*)
     val split (t : tree) (k : key) : (tree, bool, tree)
     requires {valid_tree t}
-    ensures {let (l, b, r) = result in
+    (* ensures {let (l, b, r) = result in
         valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k /\ b = contains t k
-        /\ contains l k = false /\ contains r k = false}
+        /\ contains l k = false /\ contains r k = false} *)
+    ensures {let (l, b, r) = result in forall k1. (k1 < k /\ contains t k1) -> contains l k1}
+    ensures {let (l, b, r) = result in forall k1. (k1 > k /\ contains t k1) -> contains r k1}
+    ensures {let (l, b, r) = result in valid_tree l /\ tree_less l k /\ contains l k = false}
+    ensures {let (l, b, r) = result in valid_tree r /\ tree_greater r k /\ contains r k = false}
+    ensures {let (l, b, r) = result in b = contains t k}
 
     val join (t1 : tree) (t2 : tree) : tree
     requires {valid_tree t1 /\ valid_tree t2}
     ensures {valid_tree result}
     ensures {forall k. (contains t1 k \/ contains t2 k) <-> contains result k}
-
-    (* axioms with split and join *)
-    (* axiom valid_split: forall t k. let (l, b, r) = split t k
-        in valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k /\ b = contains t k *)
-    (* axiom valid_join: forall t1 t2. valid_tree (join t1 t2) /\
-        forall k. contains t1 k \/ contains t2 k <-> contains (join t1 t2) k *)
 
     (* tree functions *)
     let empty () : tree = 
@@ -77,7 +83,9 @@ module ParametricBST
     let insert (t : tree) (k : key) : tree =
         requires {valid_tree t}
         ensures {valid_tree result}
-        ensures {forall k1. (contains t k1 \/ k1 = k) <-> contains result k1}
+        ensures {forall k1. (k1 <> k /\ contains t k1) -> contains result k1}
+        ensures {contains result k}
+        (* ensures {forall k1. (contains t k1 \/ k1 = k) <-> contains result k1} *)
         let (l, _, r) = split t k in 
         joinM l k r
 
@@ -85,7 +93,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k1. (contains t1 k1 /\ contains t2 k1) <-> contains result k1}
+        ensures {forall k1. (contains t1 k1 /\ contains t2 k1) -> contains result k1}
         match (t1, t2) with
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> Leaf 
@@ -101,7 +109,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k. (contains t1 k /\ (contains t2 k = false)) <-> contains result k}
+        ensures {forall k. (contains t1 k /\ (contains t2 k = false)) -> contains result k}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
@@ -116,7 +124,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k1. (contains t1 k1 \/ contains t2 k1) <-> contains result k1}
+        ensures {forall k1. (contains t1 k1 \/ contains t2 k1) -> contains result k1}
         match (t1 ,t2) with 
           (Leaf, _) -> t2 
         | (_, Leaf) -> t1 
