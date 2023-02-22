@@ -43,11 +43,11 @@ module ParametricBST
     (* ensures {let (l, b, r) = result in
         valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k /\ b = contains t k
         /\ contains l k = false /\ contains r k = false} *)
-    ensures {let (l, b, r) = result in forall k1. (k1 < k /\ contains t k1) -> contains l k1}
-    ensures {let (l, b, r) = result in forall k1. (k1 > k /\ contains t k1) -> contains r k1}
-    ensures {let (l, b, r) = result in valid_tree l /\ tree_less l k /\ contains l k = false}
-    ensures {let (l, b, r) = result in valid_tree r /\ tree_greater r k /\ contains r k = false}
-    ensures {let (l, b, r) = result in b = contains t k}
+    ensures {let (l, _, _) = result in forall k1. (k1 < k /\ contains t k1) -> contains l k1}
+    ensures {let (_, _, r) = result in forall k1. (k1 > k /\ contains t k1) -> contains r k1}
+    ensures {let (l, _, _) = result in valid_tree l /\ tree_less l k /\ contains l k = false}
+    ensures {let (_, _, r) = result in valid_tree r /\ tree_greater r k /\ contains r k = false}
+    ensures {let (_, b, _) = result in b = contains t k}
 
     val join (t1 : tree) (t2 : tree) : tree
     requires {valid_tree t1 /\ valid_tree t2}
@@ -109,15 +109,24 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k. (contains t1 k /\ (contains t2 k = false)) -> contains result k}
+        ensures {forall k. (contains t1 k = false) -> (not contains result k)}
+        ensures {forall k. (contains t1 k /\ contains t2 k) -> (not contains result k)}
+        ensures {forall k. (contains t1 k /\ (not contains t2 k)) -> contains result k}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
-        | (Node l1 k1 r1, _) ->
-            let (l2, b, r2) = split t2 k1 in 
+        | (Node l1 k r1, _) ->
+            let (l2, b, r2) = split t2 k in 
             let l = difference l1 l2 in 
             let r = difference r1 r2 in 
-            if b then join l r else joinM l k1 r 
+            assert { contains l k = false } ;
+            assert { contains r k = false } ;
+            if b then 
+              (assert { contains t2 k } ;
+              join l r)
+            else 
+              (assert { contains t2 k = false } ;
+              joinM l k r )
         end 
 
     let rec union (t1 : tree) (t2 : tree) : tree =
