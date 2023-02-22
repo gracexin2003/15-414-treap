@@ -32,12 +32,21 @@ module ParametricBST
 
     (* split and join*)
     val split (t : tree) (k : key) : (tree, bool, tree)
+    requires {valid_tree t}
+    ensures {let (l, b, r) = result in
+        valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k /\ b = contains t k
+        /\ contains l k = false /\ contains r k = false}
+
     val join (t1 : tree) (t2 : tree) : tree
+    requires {valid_tree t1 /\ valid_tree t2}
+    ensures {valid_tree result}
+    ensures {forall k. (contains t1 k \/ contains t2 k) <-> contains result k}
 
     (* axioms with split and join *)
-    axiom valid_split: forall t k. let (l, _, r) = split t k
-        in valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k
-    axiom valid_join: forall t1 t2. valid_tree (join t1 t2)
+    (* axiom valid_split: forall t k. let (l, b, r) = split t k
+        in valid_tree l /\ valid_tree r /\ tree_less l k /\ tree_greater r k /\ b = contains t k *)
+    (* axiom valid_join: forall t1 t2. valid_tree (join t1 t2) /\
+        forall k. contains t1 k \/ contains t2 k <-> contains (join t1 t2) k *)
 
     (* tree functions *)
     let empty () : tree = 
@@ -47,7 +56,8 @@ module ParametricBST
 
     let singleton (k : key) : tree =
         ensures {valid_tree result}
-        ensures {forall k1. k1 <> k <-> contains result k = false}
+        ensures {contains result k}
+        ensures {forall k1. k1 <> k -> contains result k1 = false}
         Node Leaf k Leaf
 
     let delete (t : tree) (k : key) : tree =
@@ -60,14 +70,14 @@ module ParametricBST
     let joinM (t1 : tree) (k : key) (t2 : tree) : tree = 
         requires {valid_tree t1 /\ valid_tree t2}
         ensures {valid_tree result}
-        ensures {forall k1. contains t1 k1 \/ contains t2 k1 <-> contains result k1}
+        ensures {forall k1. (contains t1 k1 \/ contains t2 k1 \/ k1 = k) <-> contains result k1}
         ensures {contains result k}
         join t1 (join (singleton k) t2)
 
     let insert (t : tree) (k : key) : tree =
         requires {valid_tree t}
         ensures {valid_tree result}
-        ensures {forall k1. contains t k1 \/ k1 = k <-> contains result k1}
+        ensures {forall k1. (contains t k1 \/ k1 = k) <-> contains result k1}
         let (l, _, r) = split t k in 
         joinM l k r
 
@@ -75,7 +85,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k1. contains t1 k1 /\ contains t2 k1 <-> contains result k1}
+        ensures {forall k1. (contains t1 k1 /\ contains t2 k1) <-> contains result k1}
         match (t1, t2) with
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> Leaf 
@@ -91,7 +101,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k. contains t1 k /\ (contains t2 k = false) <-> contains result k}
+        ensures {forall k. (contains t1 k /\ (contains t2 k = false)) <-> contains result k}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
@@ -106,7 +116,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k1. contains t1 k1 \/ contains t2 k1 <-> contains result k1}
+        ensures {forall k1. (contains t1 k1 \/ contains t2 k1) <-> contains result k1}
         match (t1 ,t2) with 
           (Leaf, _) -> t2 
         | (_, Leaf) -> t1 
