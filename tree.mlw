@@ -42,26 +42,32 @@ module ParametricBST
     (* tree functions *)
     let empty () : tree = 
         ensures {valid_tree result}
+        ensures {forall k. contains result k = false}
         Leaf
 
     let singleton (k : key) : tree =
         ensures {valid_tree result}
+        ensures {forall k1. k1 <> k <-> contains result k = false}
         Node Leaf k Leaf
 
     let delete (t : tree) (k : key) : tree =
         requires {valid_tree t}
         ensures {valid_tree result}
+        ensures {contains result k = false}
         let (l, _, r) = split t k in 
         join l r
 
     let joinM (t1 : tree) (k : key) (t2 : tree) : tree = 
         requires {valid_tree t1 /\ valid_tree t2}
         ensures {valid_tree result}
+        ensures {forall k1. contains t1 k1 \/ contains t2 k1 <-> contains result k1}
+        ensures {contains result k}
         join t1 (join (singleton k) t2)
 
     let insert (t : tree) (k : key) : tree =
         requires {valid_tree t}
         ensures {valid_tree result}
+        ensures {forall k1. contains t k1 \/ k1 = k <-> contains result k1}
         let (l, _, r) = split t k in 
         joinM l k r
 
@@ -69,6 +75,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
+        ensures {forall k1. contains t1 k1 /\ contains t2 k1 <-> contains result k1}
         match (t1, t2) with
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> Leaf 
@@ -84,6 +91,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
+        ensures {forall k. contains t1 k /\ (contains t2 k = false) <-> contains result k}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
@@ -98,6 +106,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
+        ensures {forall k1. contains t1 k1 \/ contains t2 k1 <-> contains result k1}
         match (t1 ,t2) with 
           (Leaf, _) -> t2 
         | (_, Leaf) -> t1 
