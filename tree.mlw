@@ -112,8 +112,8 @@ module ParametricBST
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
-        | (Node l1 k1 r1, _) ->
-            let (l2, b, r2) = split t2 k1 in 
+        | (Node l1 k r1, _) ->
+            let (l2, b, r2) = split t2 k in 
             let l = difference l1 l2 in 
             let r = difference r1 r2 in 
             assert {not contains l1 k1};
