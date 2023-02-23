@@ -4,31 +4,31 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
-<path name=".."/><path name="tree.mlw"/>
+<path name=".."/><path name="parametricbst.mlw"/>
 <theory name="ParametricBST" proved="true">
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="singleton&#39;vc" expl="VC for singleton" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="108"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="108"/></proof>
  </goal>
  <goal name="delete&#39;vc" expl="VC for delete" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="38"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
  </goal>
  <goal name="joinM&#39;vc" expl="VC for joinM" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="47"/></proof>
  </goal>
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="46"/></proof>
  </goal>
  <goal name="intersection&#39;vc" expl="VC for intersection" proved="true">
- <proof prover="0"><result status="valid" time="0.45" steps="2085"/></proof>
+ <proof prover="0"><result status="valid" time="0.34" steps="2085"/></proof>
  </goal>
  <goal name="difference&#39;vc" expl="VC for difference" proved="true">
- <proof prover="0"><result status="valid" time="0.42" steps="1690"/></proof>
+ <proof prover="0"><result status="valid" time="0.48" steps="1690"/></proof>
  </goal>
  <goal name="union&#39;vc" expl="VC for union" proved="true">
- <proof prover="0"><result status="valid" time="0.22" steps="1125"/></proof>
+ <proof prover="0"><result status="valid" time="0.28" steps="1125"/></proof>
  </goal>
 </theory>
 </file>
