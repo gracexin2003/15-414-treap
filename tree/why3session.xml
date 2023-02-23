@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="tree.mlw"/>
+<theory name="ParametricBST" proved="true">
+ <goal name="empty&#39;vc" expl="VC for empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
+ <goal name="singleton&#39;vc" expl="VC for singleton" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="92"/></proof>
+ </goal>
+ <goal name="delete&#39;vc" expl="VC for delete" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+ </goal>
+ <goal name="joinM&#39;vc" expl="VC for joinM" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="47"/></proof>
+ </goal>
+ <goal name="insert&#39;vc" expl="VC for insert" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="42"/></proof>
+ </goal>
+ <goal name="intersection&#39;vc" expl="VC for intersection" proved="true">
+ <proof prover="0"><result status="valid" time="0.24" steps="974"/></proof>
+ </goal>
+ <goal name="difference&#39;vc" expl="VC for difference" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="188"/></proof>
+ </goal>
+ <goal name="union&#39;vc" expl="VC for union" proved="true">
+ <proof prover="0"><result status="valid" time="0.22" steps="768"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
