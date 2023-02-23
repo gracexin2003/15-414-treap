@@ -90,7 +90,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k1. (contains t1 k1 /\ contains t2 k1) -> contains result k1}
+        ensures {forall k1. (contains t1 k1 /\ contains t2 k1) <-> contains result k1}
         match (t1, t2) with
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> Leaf 
@@ -106,38 +106,14 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k. (contains t1 k /\ (not contains t2 k)) -> contains result k}
-        ensures {forall k. (not contains t1 k) /\ (not contains t2 k) -> (not contains result k)}
-        ensures {forall k. (not contains t1 k \/ contains t2 k) -> not contains result k}
+        ensures {forall k. (contains t1 k /\ (not contains t2 k)) <-> contains result k}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
-        | (Node l1 k r1, _) ->
-            let (l2, b, r2) = split t2 k in 
+        | (Node l1 k1 r1, _) ->
+            let (l2, b, r2) = split t2 k1 in 
             let l = difference l1 l2 in 
             let r = difference r1 r2 in 
-            assert {not contains l1 k1};
-            assert {not contains l2 k1};
-            assert {not contains r1 k1};
-            assert {not contains r2 k1};
-            assert {not contains l k1};
-            assert {not contains r k1};
-            assert {forall k. (contains l1 k /\ (contains l2 k <-> false)) -> contains l k};
-            assert {forall k. (contains r1 k /\ (contains r2 k <-> false)) -> contains r k};
-            let tmp = join l r in 
-            let tmp2 = joinM l k1 r in
-            (* assert {forall k. (contains t1 k /\ not contains t2 k) -> contains tmp k}; *)
-            assert {forall k. (k < k1 /\ contains t1 k) -> contains l1 k};
-            assert {forall k. (k < k1 /\ not contains t2 k) -> not contains l2 k};
-            assert {forall k. (k < k1 /\ contains t1 k /\ not contains t2 k) -> contains l k};
-            assert {forall k. (k > k1 /\ contains t1 k /\ not contains t2 k) -> contains r k};
-            assert {forall k. (k < k1 /\ contains t1 k /\ not contains t2 k) -> contains tmp k};
-            assert {forall k. (k > k1 /\ contains t1 k /\ not contains t2 k) -> contains tmp k};
-            assert {forall k. (k = k1 /\ contains t1 k /\ not contains t2 k) -> contains tmp k};
-            assert {forall k. (k = k1 /\ b) -> (contains t2 k /\ not contains tmp k)};
-            assert {forall k. (contains t1 k /\ not contains t2 k) -> contains tmp2 k};
-            assert {b -> not contains tmp k1};
-            assert {not b -> contains tmp2 k1};
             if b then join l r else joinM l k1 r
         end 
 
@@ -145,7 +121,7 @@ module ParametricBST
         requires {valid_tree t1 /\ valid_tree t2}
         variant {t1}
         ensures {valid_tree result}
-        ensures {forall k1. (contains t1 k1 \/ contains t2 k1) -> contains result k1}
+        ensures {forall k1. (contains t1 k1 \/ contains t2 k1) <-> contains result k1}
         match (t1 ,t2) with 
           (Leaf, _) -> t2 
         | (_, Leaf) -> t1 
