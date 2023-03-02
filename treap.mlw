@@ -1,0 +1,11 @@
+module Treap
+
+    type key = int
+    type priority = int 
+    type Tree = Leaf | Node tree key tree
+
+    let split (t : tree) (k : key) : (tree, bool, tree)
+
+    let join (t1 : tree) (t2 : tree) : tree
+
+end
