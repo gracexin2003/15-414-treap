@@ -8,6 +8,37 @@ module Treap
 
     val hash (k : key) : priority
 
+    (* self-defined predicates *)
+    predicate tree_less (t : tree) (k : key) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k1 p r) -> (tree_less l k) /\ (k1 < k) /\ (tree_less r k) 
+        end 
+    
+    predicate tree_greater (t : tree) (k : key) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k1 p r) -> (tree_greater l k) /\ (k1 > k) /\ (tree_greater r k) 
+        end
+
+    predicate contains (t : tree) (k : key) =
+        match t with 
+          Leaf -> false 
+        | (Node l k1 p r) -> k1 = k \/ contains l k \/ contains r k
+        end
+    
+    predicate valid_treap (t : tree) = 
+        match t with 
+          Leaf -> true 
+        | (Node l k p r) -> valid_treap l /\ tree_less l k
+            /\ valid_treap r /\ tree_greater r k
+            /\ (forall k1. (k1 < k /\ contains t k1) <-> contains l k1)
+            /\ (forall k1. (k1 > k /\ contains t k1) <-> contains r k1)
+            (* adding more conditions idk if this will help *)
+            /\ (forall k1. contains l k1 -> not contains r k1)
+            /\ (forall k1. contains r k1 -> not contains l k1)
+        end
+
     let rec split (t : tree) (k : key) : (tree, bool, tree) =
         match t with 
           Leaf -> (Leaf, false, Leaf)
@@ -30,48 +61,48 @@ module Treap
 
     (* old bst functions, need to add/modify contracts*)
     let empty () : tree = 
-        ensures {valid_tree result}
+        ensures {valid_treap result}
         ensures {forall k. contains result k = false}
         Leaf
     
     let singleton (k : key) : tree =
-        ensures {valid_tree result}
+        ensures {valid_treap result}
         ensures {contains result k}
         ensures {forall k1. k1 <> k -> contains result k1 = false}
         Node Leaf k (hash k) Leaf
 
     let delete (t : tree) (k : key) : tree =
-        requires {valid_tree t}
-        ensures {valid_tree result}
+        requires {valid_treap t}
+        ensures {valid_treap result}
         ensures {contains result k = false}
         ensures {forall k1. contains result k1 -> contains t k1}
         let (l, _, r) = split t k in 
         join l r
 
     let joinM (t1 : tree) (k : key) (t2 : tree) : tree = 
-        requires {valid_tree t1 /\ valid_tree t2}
-        ensures {valid_tree result}
+        requires {valid_treap t1 /\ valid_treap t2}
+        ensures {valid_treap result}
         ensures {forall k1. (contains t1 k1 \/ contains t2 k1 \/ k1 = k) <-> contains result k1}
         ensures {contains result k}
         join t1 (join (singleton k) t2)
 
     let insert (t : tree) (k : key) : tree =
-        requires {valid_tree t}
-        ensures {valid_tree result}
+        requires {valid_treap t}
+        ensures {valid_treap result}
         ensures {forall k1. contains result k1 <-> (k1 = k \/ contains t k1)}
         ensures {contains result k}
         let (l, _, r) = split t k in 
         joinM l k r
 
     let rec intersection (t1 : tree) (t2 : tree) : tree =
-        requires {valid_tree t1 /\ valid_tree t2}
+        requires {valid_treap t1 /\ valid_treap t2}
         variant {t1}
-        ensures {valid_tree result}
+        ensures {valid_treap result}
         ensures {forall k1. (contains t1 k1 /\ contains t2 k1) <-> contains result k1}
         match (t1, t2) with
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> Leaf 
-        | (Node l1 k1 r1, _) ->
+        | (Node l1 k1 p1 r1, _) ->
             let (l2, b, r2) = split t2 k1 in
             let l = intersection l1 l2 in
             let r = intersection r1 r2 in 
@@ -80,14 +111,14 @@ module Treap
 
     (* t1 - t2 *)
     let rec difference (t1 : tree) (t2 : tree) : tree =
-        requires {valid_tree t1 /\ valid_tree t2}
+        requires {valid_treap t1 /\ valid_treap t2}
         variant {t1}
-        ensures {valid_tree result}
+        ensures {valid_treap result}
         ensures {forall k. (contains t1 k /\ (not contains t2 k)) <-> contains result k}
         match (t1, t2) with 
           (Leaf, _) -> Leaf 
         | (_, Leaf) -> t1 
-        | (Node l1 k1 r1, _) ->
+        | (Node l1 k1 p1 r1, _) ->
             let (l2, b, r2) = split t2 k1 in 
             let l = difference l1 l2 in 
             let r = difference r1 r2 in 
@@ -95,14 +126,14 @@ module Treap
         end 
 
     let rec union (t1 : tree) (t2 : tree) : tree =
-        requires {valid_tree t1 /\ valid_tree t2}
+        requires {valid_treap t1 /\ valid_treap t2}
         variant {t1}
-        ensures {valid_tree result}
+        ensures {valid_treap result}
         ensures {forall k1. (contains t1 k1 \/ contains t2 k1) <-> contains result k1}
         match (t1 ,t2) with 
           (Leaf, _) -> t2 
         | (_, Leaf) -> t1 
-        | (Node l1 k1 r1, _) ->
+        | (Node l1 k1 p1 r1, _) ->
             let (l2, _, r2) = split t2 k1 in 
             let l = union l1 l2 in 
             let r = union r1 r2 in 
