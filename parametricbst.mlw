@@ -3,7 +3,10 @@ module ParametricBST
     use int.Int
 
     type key = int
+    type priority = int
     type tree = Leaf | Node tree key tree
+
+    function hash (k : key) : priority
 
     (* self-defined predicate/axioms *)
     predicate tree_less (t : tree) (k : key) = 
@@ -31,9 +34,8 @@ module ParametricBST
             /\ valid_tree r /\ tree_greater r k
             /\ (forall k1. (k1 < k /\ contains t k1) <-> contains l k1)
             /\ (forall k1. (k1 > k /\ contains t k1) <-> contains r k1)
-            (* adding more conditions idk if this will help *)
-            /\ (forall k1. contains l k1 -> not contains r k1)
-            /\ (forall k1. contains r k1 -> not contains l k1)
+            /\ (forall k1. contains l k1 -> hash k >= hash k1)
+            /\ (forall k1. contains r k1 -> hash k >= hash k1)
         end
 
     (* split and join *)
