@@ -6,6 +6,8 @@ module Treap
     type priority = int
     type treap = Leaf | Node treap key priority treap
 
+    val hash (k : key) : priority
+
     (* self-defined predicates *)
     predicate treap_less (t : treap) (k : key) = 
         match t with 
@@ -45,6 +47,7 @@ module Treap
     (* split and join *)
     let rec split (t : treap) (k : key) : (treap, bool, treap) =
         requires {valid_treap t}
+        variant {t}
         ensures {let (l, _, _) = result in forall k1. (k1 < k /\ contains t k1) <-> contains l k1}
         ensures {let (_, _, r) = result in forall k1. (k1 > k /\ contains t k1) <-> contains r k1}
         ensures {let (l, _, _) = result in valid_treap l /\ treap_less l k}
@@ -64,6 +67,7 @@ module Treap
     
     let rec join (t1 : treap) (t2 : treap) : treap =
         requires {valid_treap t1 /\ valid_treap t2}
+        variant {t1, t2}
         ensures {valid_treap result}
         ensures {forall k1, k2. (contains t1 k1 /\ contains t2 k2) -> k1 < k2}
         ensures {forall k. (contains t1 k \/ contains t2 k) <-> contains result k}
@@ -76,7 +80,7 @@ module Treap
         end
 
     (* treap functions *)
-    val hash (k : key) : priority
+    
 
     let empty () : treap = 
         ensures {valid_treap result}
