@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="treap.mlw"/>
+<theory name="Treap" proved="true">
+ <goal name="split&#39;vc" expl="VC for split" proved="true">
+ <proof prover="0" timelimit="1"><result status="valid" time="0.49" steps="3180"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="83393"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="2556069"/></proof>
+ </goal>
+ <goal name="join&#39;vc" expl="VC for join" proved="true">
+ <proof prover="0" timelimit="1"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="83900"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="2476233"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="join&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="14666"/></proof>
+  </goal>
+  <goal name="join&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="11887"/></proof>
+  </goal>
+  <goal name="join&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="13845"/></proof>
+  </goal>
+  <goal name="join&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="14458"/></proof>
+  </goal>
+  <goal name="join&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="11835"/></proof>
+  </goal>
+  <goal name="join&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="13714"/></proof>
+  </goal>
+  <goal name="join&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="unknown" time="0.11" steps="7558"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00" steps="2219486"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="join&#39;vc.6.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.04" steps="3648"/></proof>
+   </goal>
+   <goal name="join&#39;vc.6.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="3687"/></proof>
+   </goal>
+   <goal name="join&#39;vc.6.2" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="3687"/></proof>
+   </goal>
+   <goal name="join&#39;vc.6.3" expl="postcondition" proved="true">
+   <proof prover="0" timelimit="1"><result status="valid" time="0.57" steps="2603"/></proof>
+   <proof prover="1"><result status="unknown" time="0.14" steps="14636"/></proof>
+   <proof prover="2"><result status="timeout" time="1.00" steps="2549861"/></proof>
+   </goal>
+   <goal name="join&#39;vc.6.4" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.81" steps="2225715"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="join&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="unknown" time="0.13" steps="7497"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00" steps="1948236"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="join&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.20" steps="271604"/></proof>
+   </goal>
+   <goal name="join&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="0" timelimit="1"><result status="valid" time="0.23" steps="885"/></proof>
+   <proof prover="1"><result status="unknown" time="0.05" steps="7459"/></proof>
+   <proof prover="2"><result status="timeout" time="1.00" steps="2234873"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="empty&#39;vc" expl="VC for empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
+ <goal name="singleton&#39;vc" expl="VC for singleton" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="92"/></proof>
+ </goal>
+ <goal name="delete&#39;vc" expl="VC for delete" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="43"/></proof>
+ </goal>
+ <goal name="joinM&#39;vc" expl="VC for joinM" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="55"/></proof>
+ </goal>
+ <goal name="insert&#39;vc" expl="VC for insert" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="49"/></proof>
+ </goal>
+ <goal name="intersection&#39;vc" expl="VC for intersection" proved="true">
+ <proof prover="0"><result status="valid" time="0.33" steps="1921"/></proof>
+ </goal>
+ <goal name="difference&#39;vc" expl="VC for difference" proved="true">
+ <proof prover="0"><result status="valid" time="0.42" steps="2407"/></proof>
+ </goal>
+ <goal name="union&#39;vc" expl="VC for union" proved="true">
+ <proof prover="0"><result status="valid" time="0.35" steps="1798"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
